@@ -4,47 +4,40 @@ test('Form Upload Flow', async ({ page }) => {
 
   test.setTimeout(120000);
 
-  await page.goto('https://idp.automationanywhere.com/');
+  await page.goto('https://community.cloud.automationanywhere.digital/#/login');
 
-  try {
-    await page.click('text=Accept All Cookies', { timeout: 5000 });
-  } catch {}
+  await page.getByRole('textbox', { name: 'Username' }).fill('spurthi.k@campusuvce.in');
+  await page.getByRole('textbox', { name: 'Password' }).fill('Hiautomation@12');
 
-  await page.fill('input[placeholder="*Email"]', 'spurthi.k@campusuvce.in');
-  await page.click('button:has-text("Next")');
+  await page.getByRole('button', { name: /log in/i }).click();
 
-  await page.waitForSelector('input[placeholder="Password"]');
-  await page.fill('input[placeholder="Password"]', 'Hiautomation@123');
+  await page.waitForURL('**/home');
 
-  await page.locator('button:has-text("Sign"), button:has-text("Login")')
-    .first()
-    .click()
-    .catch(() => {});
+  await page.getByRole('link', { name: 'Automation', exact: true }).click();
 
-  await page.goto('https://idp.automationanywhere.com/s/automation', {
-    waitUntil: 'domcontentloaded'
-  }).catch(() => {});
-
-  await page.waitForLoadState('domcontentloaded');
-
-  try {
-    await page.waitForSelector('text=Create', { timeout: 15000 });
-  } catch {
-    await page.reload();
-    await page.waitForSelector('text=Create', { timeout: 15000 });
-  }
+  await expect(page.getByRole('button', { name: /create/i })).toBeVisible({ timeout: 20000 });
 
   await page.getByRole('button', { name: /create/i }).click();
-  await page.getByText('Form').click();
 
-  await page.waitForTimeout(2000);
+  await page.getByRole('button', { name: /task bot/i }).click();
 
-  await page.locator('input').first().fill('Test Input');
+  await page.fill('input[name="name"]', `Test Bot ${Date.now()}`);
+  await page.getByRole('button', { name: /create & edit/i }).click();
 
-  await page.setInputFiles('input[type="file"]', 'tests/sample.pdf');
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(8000);
 
-  await expect(page.locator('text=sample.pdf')).toBeVisible();
+  const searchBox = page.getByPlaceholder(/search/i).first();
+
+  await searchBox.waitFor({ timeout: 15000 });
+  await searchBox.fill('Message Box');
+  await page.waitForSelector('text=Message Box', { timeout: 10000 });
+  await page.locator('text=Message Box').first().click();
+
+  await expect(page.locator('text=Message Box')).toBeVisible();
 
   await page.getByRole('button', { name: /save/i }).click();
+
+  await page.waitForTimeout(3000);
 
 });
