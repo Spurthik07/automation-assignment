@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('Message Box Flow', async ({ page }) => {
 
-  test.setTimeout(60000); // ✅ increase timeout
+  test.setTimeout(60000); 
 
   await page.goto('https://idp.automationanywhere.com/');
 
